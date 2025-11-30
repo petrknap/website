@@ -1,16 +1,18 @@
 package cz.petrknap.website.backups;
 
+import io.github.petrknap.persistence.zoneddatetime.UtcDateTimeConverter;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 @Entity
 @Table(name = "backups")
 public class Metadata {
     @Id
     private String identifier;
-    private LocalDateTime refreshedAt;
+    @Convert(converter = UtcDateTimeConverter.class)
+    private ZonedDateTime refreshedAt;
     @Column(nullable = false)
     @Min(1)
     private Integer freshForHours;
@@ -31,7 +33,7 @@ public class Metadata {
         return identifier;
     }
 
-    public LocalDateTime getRefreshedAt() {
+    public ZonedDateTime getRefreshedAt() {
         return refreshedAt;
     }
 
@@ -44,10 +46,10 @@ public class Metadata {
     }
 
     public void refresh() {
-        refreshedAt = LocalDateTime.now();
+        refreshedAt = ZonedDateTime.now();
     }
 
     public boolean isFresh() {
-        return refreshedAt != null && LocalDateTime.now().minusHours(freshForHours).isBefore(refreshedAt);
+        return refreshedAt != null && ZonedDateTime.now().minusHours(freshForHours).isBefore(refreshedAt);
     }
 }
